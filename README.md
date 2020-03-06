@@ -13,6 +13,6 @@ The live version at the link above allows you enter any Spotify playlist and let
 
 The second version allows you to sign into your Spotify account and get your playlists imported into the app. You can more easily access your tracks, however, it must be downloaded and run in RStudio. 
 
-#3
+# 3
 
 The third version lets you guess the song live as it is playing on Spotify. You get to use the entire song and this also times you on how long it takes to enter a result. It also needs to be downloaded and run in RStudio because you need to be active on Spotify and listening to a song.
