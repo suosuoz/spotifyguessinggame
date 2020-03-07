@@ -17,4 +17,4 @@ The third version lets you guess the song live as you are playing it on Spotify.
 
 Connect with me at https://www.linkedin.com/in/mattmatsuo
 
-https://puu.sh/FhTT1.png
+![](images/chrome_2020-03-06_16-10-16.png)
