@@ -16,3 +16,5 @@ The second version allows you to sign into your Spotify account and get your pla
 The third version lets you guess the song live as you are playing it on Spotify. You get to use the entire song and this also times you on how long it takes to enter a result. It also needs to be downloaded and run in RStudio because you need to be active on Spotify and listening to a song.
 
 Connect with me at https://www.linkedin.com/in/mattmatsuo
+
+https://puu.sh/FhTT1.png
