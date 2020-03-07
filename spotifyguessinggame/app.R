@@ -6,6 +6,7 @@ library(dplyr)
 library(stringdist)
 library(shinyjs)
 library(stringr)
+library(httr)
 
 #The HTML/CSS of the Website
 ui <- fluidPage(
@@ -24,7 +25,11 @@ ui <- fluidPage(
         padding-bottom: 20px;
       }
 
-    "))
+    ")),
+    
+    #Allows "Submit" == press Enter Key
+    tags$head(tags$script(src = "enter_button.js")) 
+    
   ),
   
   headerPanel(
@@ -32,7 +37,6 @@ ui <- fluidPage(
   ),
   
   sidebarPanel(
-    p("2 Things: error on a bad playlist, bind enter key/auto select text box"),
     p("This is your formal volume warning."),
     p("The goal of this game is to simply guess the artist of a song. If there are multiple artists on the track, just enter any one singer. You will have thirty seconds to guess each song. If time runs out, please hit the submit button to go to the next track. Once you finish a playlist, you can enter a new URI to keep playing or reenter the same URI to play it again. Finally, there is a little bit of leniency, so don't worry if you mispell an artist!"),
     br(),
@@ -114,8 +118,8 @@ get_newplay <- function() {
 server <- function(input, output, session) {
   
   #Get my Spotify App ID and Secret
-  Sys.setenv(SPOTIFY_CLIENT_ID = "182b5e445ae845498a60c3fa49b689a7")
-  Sys.setenv(SPOTIFY_CLIENT_SECRET = "4b93c4ee1a2b4a0fb70eb0e56f7b7fa2")
+  Sys.setenv(SPOTIFY_CLIENT_ID = "YOUR_CLIENT_ID")
+  Sys.setenv(SPOTIFY_CLIENT_SECRET = "YOUR_CLIENT_SECRET")
   
   
   #Hide elements to prevent errors
@@ -147,27 +151,17 @@ server <- function(input, output, session) {
     ttt <- str_replace(input$txt2, "spotify:playlist:", "")
     
     
-    #Check if the user's input a valid playlist
+    #Check if the user's input a valid playlist (has the correct length and is the correct format (tested by seeing if it can go to a valid playlist))
     txtcheck <- TRUE
+    url1 <- paste0("https://open.spotify.com/playlist/",ttt)
     
     if(str_length(ttt) != 22){
       txtcheck <- FALSE
     }
-    
-    #xx <- FALSE
-    
-    # xx <- reactive({
-    #   validate(
-    #     need(get_playlist(ttt) == )
-    #   )
-    # })
-    # 
-    # xx <- try(get_playlist(ttt))
-    # if("try-error" %in% class(xx)) txtcheck == FALSE
-    
-    #xx <- tryCatch(get_playlist(ttt),  error = function(e) txtcheck == FALSE)
-    #xx <- get_playlist(ttt)
-    
+    if(http_error(url1)){
+      txtcheck <- FALSE
+    }
+
     
     #If the playlist is valid
     if (txtcheck == TRUE) {
@@ -220,6 +214,14 @@ server <- function(input, output, session) {
   
   #What occurs when the guess song button is pressed
   observeEvent(input$guessbutton, {
+    
+    #Allows "Submit" == press Enter Key
+    value <- eventReactive(input$guessbutton, {
+      input$txt1
+    })
+    
+    
+    
     
     #Record a guess
     guesses2 <<- guesses2 + 1
