@@ -5,7 +5,7 @@ I have been listening to Spotify for years now and have enjoyed quizzing myself 
 # 1 The Finished Game
 https://suosuoz.shinyapps.io/spotifyguessinggame/
 
-The live version at the link above allows you enter any Spotify playlist and lets you guess whether or not you know the artist of the randomly selected song. 
+The live version at the link above allows you play a guessing game from any Spotify playlist. The app first lets you decide on playing guess the artist or guess the song title. After linking a valid playlist, the app will sample a subset of the playlist and let you test your music knowledge.
 
 # 2 Easier Playlist Control - with a catch
 
