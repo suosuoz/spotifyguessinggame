@@ -1,5 +1,5 @@
 $(document).keyup(function(event) {
-    if ($("#txt1").is(":focus") && (event.key == "Enter")) {
-        $("#guessbutton").click();
+    if ($("#gts_ui_guess").is(":focus") && (event.key == "Enter")) {
+        $("#gts_but_submit_guess").click();
     }
 });
