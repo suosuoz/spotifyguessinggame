@@ -1,4 +1,8 @@
-#Import Libraries
+#Spotify Guessing Game
+#Matt Matsuo
+
+
+###Import Libraries
 library(shiny)
 library(DT)
 library(spotifyr)
@@ -9,18 +13,39 @@ library(stringr)
 library(httr)
 
 
+#
+#
+#
 
-#The HTML/CSS of the Website
+#
+#
+#
+
+
+###Setup the structure of the website with HTML/CSS
 ui <- fluidPage(
   
-  #Needed so we can run js code to 
+  ###Allows use of javascript 
   useShinyjs(),
   
   
-  tags$head(
-    tags$style(HTML("
-      @import url('//fonts.googleapis.com/css?family=Lobster|Cabin:400,700');
-      h1 {
+  #
+  #
+  #
+  
+  #
+  #
+  #
+  
+  
+  ###Header - Green title with Github link
+  tags$head
+  (
+    tags$style
+    (HTML
+      ("@import url('//fonts.googleapis.com/css?family=Lobster|Cabin:400,700');
+      h1 
+      {
         font-family: 'open sans light', Verdana, sans-serif;
         font-weight: 500;
         line-height: 1.1;
@@ -28,34 +53,57 @@ ui <- fluidPage(
         text-align: center;
         padding-bottom: 20px;
       }
-    ")),
+      ")
+    ),
     
     tags$title("Spotify Guessing Game"),
     
-    #Allows "Submit" == press Enter Key
-    tags$script(src = "enter_button.js"),
-    tags$script(src = "enter_button1.js")
+    tags$script(src = "enter_button.js"),     #Allows the use of the Enter key in place of clicking the "Submit" button - gts_but_submit_guess
+    tags$script(src = "enter_button1.js"),    #Allows the use of the Enter key in place of clicking the "Submit" button - gta_but_submit_guess
+    tags$script(src = "enter_button2.js"),    #Allows the use of the Enter key in place of clicking the "Submit" button - gts_but_submit_numsongs
+    tags$script(src = "enter_button3.js"),    #Allows the use of the Enter key in place of clicking the "Submit" button - gta_but_submit_numsongs
+    tags$script(src = "enter_button4.js"),    #Allows the use of the Enter key in place of clicking the "Submit" button - gta_but_submit_playlist
+    tags$script(src = "enter_button5.js"),    #Allows the use of the Enter key in place of clicking the "Submit" button - gts_but_submit_playlist
   ),
   
+  headerPanel(HTML("<p>Spotify Guessing Game by suosuoz &nbsp;&nbsp;<a href='https://github.com/suosuoz/spotifyguessinggame' target='_blank'><img style='padding: 10px 0;' src=gh.png /></a></p> ")),
   
   
-  headerPanel(
-    HTML("<p>Spotify Guessing Game by suosuoz &nbsp;&nbsp;<a href='https://github.com/suosuoz/spotifyguessinggame' target='_blank'><img style='padding: 10px 0;' src=gh.png /></a></p> ")
-  ),
+  #
+  #
+  #
+  
+  #
+  #
+  #
   
   
-  
-  sidebarPanel(
-    p("The goal of this game is to simply guess the artist or title of a song. If there are multiple artists listed on the song, you only need enter one of them. You will have thirty seconds to guess each song. If time runs out, please hit the submit button to go to the next track or submit an answer. Once you finish a playlist, you can enter a new playlist at the top, replay the same playlist, or switch to the other game type. Not all tracks have listening previews and  therefore cannot be included. Finally, there is a little bit of leniency, so don't worry if you mispell an artist or track name!"),
+  ###Left Side Panel
+  sidebarPanel
+  (
+    p("Test your music knowledge! Grap your favorite playlist and see if you actually know the music you claim to be a fan of."),
     br(),
-    p("Retrieving a playlist: "),
-    tags$ol(
+    p("Follow these simple steps to retrieve a playlist: "),
+    tags$ol
+    (
       tags$li("Open Spotify"),
-      tags$li("Copy and paste the Spotify URI or Playlist Link from your selected playlist (see image below for more details) into the text box  or use one of the example codes below"),
+      tags$li("Copy and paste the link from your selected playlist (see image below)"),
       tags$li("Hit the Submit button and start guessing!")
     ),
     br(),
+    p("Other tips for using this site:"),
+    tags$ol(
+      tags$li("Your playlist must be made public (right click the playlist and click 'Add to profile')"),
+      tags$li("Some Spotify generated playlists are not eligible. To play those, select all the songs (ctrl+a) and copy and paste them into a new playlist"),
+      tags$li("If there are multiple artists listed on the song, you only need to enter one of the names to get it correct."),
+      tags$li("Unfortunately, not all tracks have listening previews which means they are not available for this game."),
+      tags$li("There is a little bit of leniency, so don't worry if you mispell anything. We got you covered."),
+      tags$li("Hit the Enter key to submit a song. It's faster than having to click the Submit button!"),
+      tags$li("There is no time limit. Use as much as you need to dig into the depths of your brain.")
+      ),
+    br(),
     p("Example playlist links to use:"),
+    p("Suo's Favorites: 5Ne9CRbMkDcICC6jVDVGB7"),
     p("Alt Megalist: 1x5H89xQejE46G1GOKqRo3"),
     p("00s Rock: 37i9dQZF1DX3oM43CtKnRV"),
     p("90s Rock: 37i9dQZF1DX1rVvRgjX59F"),
@@ -65,43 +113,76 @@ ui <- fluidPage(
   ),
   
   
+  #
+  #
+  #
   
+  #
+  #
+  #
+  
+  
+  ###Right Side Panel
   mainPanel(
-    p(id = "head1", align="center", "Choose Your Game Type"),
-    fluidRow(column(8, align="center", offset=2, actionButton("artistbutton", "Guess the Artist"),
-                                                  actionButton("songbutton", "Guess the Song"))),
+    p(id = "head1", style="font-size: 18px; font-weight: bold;", align="center", "Select Game Mode"),
     br(),
-    fluidRow(column(8, align="center", offset=2, textInput("txt2", label="Enter a Playlist Link",))),
-    fluidRow(column(8, align="center", offset=2, actionButton("selectbutton", "Submit"))),
-    fluidRow(column(8, align="center", offset=2, textInput("txt21", label="Enter a Playlist Link",))),
-    fluidRow(column(8, align="center", offset=2, actionButton("selectbutton1", "Submit"))),
+    
+    #Select the game mode - side by side options
+    fluidRow(column(8, align="center", offset=2, actionButton("gts_but_start", "Guess the Song"), actionButton("gta_but_start", "Guess the Artist"))),
     br(),
-    p(id = "jaja", align="center", "~~Please wait if you hit the Submit button~~"),
-    p(id = "jajaja", align="center", "~~Larger playlists can take about ten seconds to load~~"),
-    hr(),
-    fluidRow(column(8, align="center", offset=2, actionButton("restart", "New Playlist"))),
+    
+    #Allow ability to end round
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("restart", "End Round")))),
+    
+    
+    #After a game mode is chosen, enter a playlist link
+    #GTS
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gts_ui_playlist", label="Enter a Playlist Link",)))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gts_but_submit_playlist", "Submit")))),
+    #GTA
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gta_ui_playlist", label="Enter a Playlist Link",)))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gta_but_submit_playlist", "Submit")))),
     br(),
     br(),
-    uiOutput("numsongs"),
+    
+    #Replay buttons
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gts_but_replay_playlist", "Replay Playlist")))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gta_but_replay_playlist", "Replay Playlist")))),
+    
+    #Both
+    uiOutput("numsongsavailable"),
+    #GTS
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gts_ui_numsongs", "How many songs do you want to play?", value=25)))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gts_but_submit_numsongs", "Submit")))),
+    #GTA
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gta_ui_numsongs", "How many songs do you want to play?", value=25)))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gta_but_submit_numsongs", "Submit")))),
+    br(),
+    
+    hidden(p(id = "loading", align="center", "Loading...This may take a moment")),
+    
+    #Errors
     uiOutput("error"),
     uiOutput("error2"),
-    br(),
-    fluidRow(column(8, align="center", offset=2, uiOutput("my_audio"))),
-    fluidRow(column(8, align="center", offset=2, tags$audio(id = "myaudio", controls = NA, autoplay = NA, src = ""))),
+    uiOutput("error3"),
+    
+    hr(),
+    
+    #Audio
+    fluidRow(column(8, align="center", offset=2, hidden(uiOutput("my_audio")))),
+    fluidRow(column(8, align="center", offset=2, hidden(tags$audio(id = "myaudio", controls = NA, autoplay = NA, src = "")))),
     fluidRow(column(8, align="center", offset=2, uiOutput("newplay"))),
     br(),
-    fluidRow(column(8, align="center", offset=2, actionButton("playagainartist", "Use the Same Playlist"))),
-    fluidRow(column(8, align="center", offset=2, actionButton("playagainsong", "Use the Same Playlist"))),
-    br(),
-    fluidRow(column(8, align="center", offset=2, actionButton("switchtoartist", "Switch to Artist"))),
-    fluidRow(column(8, align="center", offset=2, actionButton("switchtosong", "Switch to Song"))),
-    br(),
-    fluidRow(column(8, align="center", offset=2, textInput("txt1", "Guess the Song Title"))),
-    fluidRow(column(8, align="center", offset=2, actionButton("guessbutton", "Submit"))),
-    fluidRow(column(8, align="center", offset=2, textInput("txt11", "Guess the Artist"))),
-    fluidRow(column(8, align="center", offset=2, actionButton("guessbutton1", "Submit"))),
+    
+    #Submit guess buttons
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gts_ui_guess", "Guess the Song")))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gts_but_submit_guess", "Submit")))),
+    fluidRow(column(8, align="center", offset=2, hidden(textInput("gta_ui_guess", "Guess the Artist")))),
+    fluidRow(column(8, align="center", offset=2, hidden(actionButton("gta_but_submit_guess", "Submit")))),
     br(),
     br(),
+    
+    #History table
     fluidRow(column(12, align="center", offset=0, verbatimTextOutput("value"))),
     DT::dataTableOutput("songtable"),
     br(),
@@ -110,13 +191,19 @@ ui <- fluidPage(
 )
 
 
+#
+#
+#
 
+#
+#
+#
 
 
 #Functions to create HTML elements
 get_numsongs_tag <- function(nrowtot_allsongs, nrowtest, totallplaylist) {
-  xy <- paste0("Your playlist has ", totallplaylist, " songs.", "\n", nrowtest, " out of ", nrowtot_allsongs, " available songs were sampled.")
-  tags$p(xy, align="center")
+  xy <- paste0("Your playlist has ", totallplaylist, " songs. ", nrowtot_allsongs, " are playable.")
+  tags$p(xy, align="center", style="font-weight: bold;")
 }
 get_error <- function() {
   tags$p("Invalid Playlist. Try Again!", align="center")
@@ -124,89 +211,100 @@ get_error <- function() {
 get_error2 <- function() {
   tags$p("All songs in the playlist do not have a preview!", align="center")
 }
+get_error3 <- function() {
+  tags$p("Not a valid number! Entry must be positive and less than the total number of available songs.", align="center")
+}
 get_newplay <- function() {
   tags$p("Enter a new playlist above ",align="center")
 }
 
 
+#
+#
+#
+
+#
+#
+#
 
 
 
-#What runs when you enter the site
+#Starts when you enter the site
 server <- function(input, output, session) {
+
   
-  
-  #Get my Spotify App ID and Secret
+  ###
+  #Get my Spotify App ID and Secret to call the API
   Sys.setenv(SPOTIFY_CLIENT_ID = "182b5e445ae845498a60c3fa49b689a7")
   Sys.setenv(SPOTIFY_CLIENT_SECRET = "4b93c4ee1a2b4a0fb70eb0e56f7b7fa2")
   
-  
-  #Immediately lowers the media volume from 1 to 0.2 (default is too loud)
+  #Lowers the media volume from 1 to 0.2 (default is too loud)
   runjs("document.getElementById('myaudio').volume = 0.2;")
   
   
-  #Hide elements that aren't needed, prevents possible errors
-  shinyjs::hide("restart")
-  shinyjs::hide("playagainartist")
-  shinyjs::hide("playagainsong")
-  shinyjs::hide("guessbutton")
-  shinyjs::hide("txt1")
-  shinyjs::hide("myaudio")
-  shinyjs::hide("txt2")
-  shinyjs::hide("selectbutton")
-  shinyjs::hide("jaja")
-  shinyjs::hide("jajaja")
-  shinyjs::hide("guessbutton1")
-  shinyjs::hide("txt11")
-  shinyjs::hide("txt21")
-  shinyjs::hide("selectbutton1")
-  shinyjs::hide("switchtoartist")
-  shinyjs::hide("switchtosong")
+  #
+  #
+  #
+  
+  #
+  #
+  #
   
   
-  
-  
-  #Initialize varables
-  
+  ###Initialize variables
   #This is the history table
-  n <- reactiveValues()
-  n$df <- data.frame("Song" = character(0),"Artist" = character(0),"Guess" = character(0),"Correct" = character(0), "Round" = character(0),stringsAsFactors = FALSE)
+  r_values <- reactiveValues()
+  r_values$df <- data.frame("Num" = character(0), "Song" = character(0),"Artist" = character(0),"Guess" = character(0),"Correct" = character(0), "Round" = character(0),stringsAsFactors = FALSE)
   
-  score <- 0
-  score2 <- 0
-  guesses <- 0
-  guesses2 <- 0
+  score_total <- 0
+  score_this_round <- 0
+  guesses_total <- 0
+  guesses_this_round <- 0
   round <- 0
+  x <- 8
   test <- data.frame(char = character(), stringsAsFactors = FALSE)
   
   #This stores the playlist value so that the replay button works
-  ttt_c <- NA
+  last_playlist <- NA
   
   
   #
   #
   #
   
+  #
+  #
+  #
   
-  #Choose which gamemode is picked: song or artist
-  observeEvent(input$songbutton, {
-    shinyjs::show("txt2")
-    shinyjs::show("selectbutton")
-    shinyjs::show("jaja")
-    shinyjs::show("jajaja")  
-    shinyjs::hide("songbutton")
-    shinyjs::hide("artistbutton")
+  
+  ###
+  #Choose which game mode is picked: song or artist
+  #GTS
+  observeEvent(input$gts_but_start, {
+    shinyjs::show("gts_ui_playlist")
+    shinyjs::show("gts_but_submit_playlist")
+    shinyjs::hide("gts_but_start")
+    shinyjs::hide("gta_but_start")
     shinyjs::hide("head1")
+    
+    #This works because round is 0 if you haven't started guessing yet 
+    if(round > 0){
+      shinyjs::show("gts_but_replay_playlist")
+    }
   })
   
-  observeEvent(input$artistbutton, {
-    shinyjs::show("txt21")
-    shinyjs::show("selectbutton1")
-    shinyjs::show("jaja")
-    shinyjs::show("jajaja")  
-    shinyjs::hide("songbutton")
-    shinyjs::hide("artistbutton")
+  #GTA
+  observeEvent(input$gta_but_start, {
+    shinyjs::show("gta_ui_playlist")
+    shinyjs::show("gta_but_submit_playlist")
+    shinyjs::hide("gts_but_start")
+    shinyjs::hide("gta_but_start")
     shinyjs::hide("head1")
+    
+    #This works because round is 0 if you haven't started guessing yet 
+    if(round > 0){
+      shinyjs::show("gta_but_replay_playlist")
+    }
   })
   
   
@@ -214,61 +312,81 @@ server <- function(input, output, session) {
   #
   #
   
+  #
+  #
+  #
   
-  #Guess the Song
-  #What occurs when you select a Playlist
-  observeEvent(input$selectbutton, {
-    shinyjs::hide("playagainsong")
-    shinyjs::hide("switchtoartist")
+  
+  ###Guess the Song
+  #Submit a playlist
+  observeEvent(input$gts_but_submit_playlist, {
     shinyjs::hide("error")
     shinyjs::hide("error2")
+    shinyjs::hide("error3")
+    shinyjs::hide("gts_but_replay_playlist")
+    shinyjs::hide("gts_ui_numsongs")
+    shinyjs::hide("gts_but_submit_numsongs")
+    shinyjs::hide("gta_ui_numsongs")
+    shinyjs::hide("gta_but_submit_numsongs")
+
     
-    #This var tracks the number of plays/score in the current sample
-    guesses2 <<- 0
-    score2 <<- 0
+    #Tracks the number of plays/score in the current sample
+    guesses_this_round <<- 0
+    score_this_round <<- 0
     round <<- round + 1
     
     #Initialize the list of songs in the playlist
     datalist = list()
     
     #Update the textbox to blank
-    updateTextInput(session, "txt2", value = "")
+    updateTextInput(session, "gts_ui_playlist", value = "")
     
+    #Allows "Submit" == press Enter Key
+    value <- eventReactive(input$gts_but_submit_playlist, {
+      input$gts_ui_playlist
+    })
+    
+    
+    #Clean playlist name and get playlist data
     #Use the user input. Cut off the first part of the copy if the link is the URI, cut off the front and end if it is a playlist link
-    ttt <- str_replace(input$txt2, "spotify:playlist:", "")
-    ttt <- gsub("https://open.spotify.com/playlist/", "\\1",ttt)
-    ttt <- gsub("\\?.*","\\1",ttt)
+    current_playlist <- str_replace(input$gts_ui_playlist, "spotify:playlist:", "")
+    current_playlist <- gsub("https://open.spotify.com/playlist/", "\\1",current_playlist)
+    current_playlist <- gsub("\\?.*","\\1",current_playlist)
+    
     
     #Check if the user's input is a valid playlist (has the correct length and is the correct format (tested by seeing if it links to a valid playlist))
     txtcheck <- TRUE
-    url1 <- paste0("https://open.spotify.com/playlist/",ttt)
-    if(str_length(ttt) != 22){
+    playlist_url <- paste0("https://open.spotify.com/playlist/",current_playlist)
+    if(str_length(current_playlist) != 22){
       txtcheck <- FALSE
     }
-    if(http_error(url1)){
+    if(http_error(playlist_url)){
       txtcheck <- FALSE
     }
-    
-    
+
+
     #If the playlist is valid
     if (txtcheck == TRUE) {
       
       #Stores the playlist link for the replay button
-      ttt_c <<- ttt
+      last_playlist <<- current_playlist
       
+      shinyjs::hide("gts_but_submit_playlist")
+      shinyjs::hide("gts_ui_playlist")
+      shinyjs::show("loading")
+
       #Spotify can only get 100 songs at a time, so calculate how many times we need to get playlists
-      runs <- get_playlist(ttt)$tracks$total %/% 100 + 1
-      
+      api_calls <- get_playlist(current_playlist)$tracks$total %/% 100 + 1
+  
       #Get all the songs in the playlist and add them to a dataframe
-      for (j in 1:runs) {
-        allsongs <- data.frame(get_playlist_tracks(ttt, offset = 100 * (j - 1)))
+      for (j in 1:api_calls) {
+        allsongs <- data.frame(get_playlist_tracks(current_playlist, offset = 100 * (j - 1)))
         datalist[[j]] <- allsongs
       }
+
       tot_allsongs <- dplyr::bind_rows(datalist)
-      
       totallplaylist <- nrow(tot_allsongs)
       
-
       #Remove songs that do not have a preview
       whichna <- which(is.na(tot_allsongs$track.preview_url))
       
@@ -277,42 +395,30 @@ server <- function(input, output, session) {
         tot_allsongs <- tot_allsongs[-c(whichna), ]    
       }
       
-      #If all the songs in the playlist are invalid, error; else run correctly
+      #If all the songs in the playlist are invalid, error
       if(nrow(tot_allsongs) == 0){
+        shinyjs::show("gts_but_submit_playlist")
+        shinyjs::show("gts_ui_playlist")
+        shinyjs::hide("loading")
+        
+        
         output$error <- renderUI(get_error())
         shinyjs::show("error")
         output$error2 <- renderUI(get_error2())
         shinyjs::show("error2")
       } else{
-        
-        #Sample either N or the number of valid songs in the playlist
-        samp <- sample(1:nrow(tot_allsongs), min(25, nrow(tot_allsongs)), replace = FALSE)
-        
-        #Store the valid songs in TEST
-        test <- tot_allsongs[samp, ]
-        
-        #Choose the first song and play it
-        shinyjs::show("myaudio")
-        songlink <- test[guesses2 + 1, ]$track.preview_url
-        runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
-        
-                #Show how many songs were sampled out of the total in the playlist
-        output$numsongs <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
-        
-        #Allow access outside of this function
-        test <<- test
-        
-        #Show/Hide HTML elements
-        shinyjs::show("restart")
-        shinyjs::show("guessbutton")
-        shinyjs::show("txt1")
-        shinyjs::show("numsongs")
+        tot_allsongs_g <<- tot_allsongs
+        totallplaylist_g <<- totallplaylist
+        shinyjs::show("numsongsavailable")
+        output$numsongsavailable <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
         shinyjs::hide("newplay")
-        shinyjs::hide("selectbutton")
-        shinyjs::hide("txt2")
+        shinyjs::hide("loading")
         shinyjs::hide("mytable")
-        shinyjs::hide("jaja")
-        shinyjs::hide("jajaja")
+        shinyjs::show("gts_ui_numsongs")
+        
+        updateTextInput(session, "gts_ui_numsongs", value = min(nrow(tot_allsongs),25))
+        
+        shinyjs::show("gts_but_submit_numsongs")
       }
     } else{
       
@@ -320,26 +426,81 @@ server <- function(input, output, session) {
       output$error <- renderUI(get_error())
       shinyjs::show("error")
     }
+    
   })
   
-  
-  #What occurs when the guess song button is pressed
-  observeEvent(input$guessbutton, {
+  #Submit number of songs
+  observeEvent(input$gts_but_submit_numsongs, {
+
     
     #Allows "Submit" == press Enter Key
-    value <- eventReactive(input$guessbutton, {
-      input$txt1
+    value <- eventReactive(input$gts_but_submit_numsongs, {
+      input$gts_ui_numsongs
     })
 
     
-    #Record the number of guesses (total and round)
-    guesses2 <<- guesses2 + 1
-    guesses <<- guesses + 1
+    numsongs <- as.numeric(input$gts_ui_numsongs)
+
+      
+    #Error statement if the input is invalid
+    if((is.na(numsongs)) | (numsongs %% 1 != 0) | (numsongs > nrow(tot_allsongs_g)) | (numsongs<=0)){
+      
+      #Update the textbox to the default 25
+      updateTextInput(session, "gts_ui_numsongs", value = 25)
+      
+      output$error3 <- renderUI(get_error3())
+      shinyjs::show("error3")
+        
+    } else{
+        
+      shinyjs::hide("error3")
+        
+      #Sample number of desired songs
+      samp <- sample(1:nrow(tot_allsongs_g), numsongs, replace = FALSE)
+        
+      #Store the valid songs in TEST
+      test <- tot_allsongs_g[samp, ]
+        
+      
+      shinyjs::show("restart")
+      shinyjs::show("gts_ui_guess")
+      shinyjs::show("gts_but_submit_guess")
+      shinyjs::hide("gts_ui_numsongs")
+      shinyjs::hide("gts_but_submit_numsongs")
+      shinyjs::hide("numsongsavailable")
+        
+        
+      #Choose the first song and play it
+      shinyjs::show("myaudio")
+      songlink <- test[guesses_this_round + 1, ]$track.preview_url
+      runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
+      
+      #Update the textbox to blank
+      updateTextInput(session, "gts_ui_numsongs", value = "")
+      
+      #Allow access outside of this function
+      test <<- test
+      }
+    numsongs <<- numsongs  
+  })
+  
+  #Submit song guess
+  observeEvent(input$gts_but_submit_guess, {
+    
+    #Allows "Submit" == press Enter Key
+    value <- eventReactive(input$gts_but_submit_guess, {
+      input$gts_ui_guess
+    })
+
+    
+    #Record the number of guesses
+    guesses_this_round <<- guesses_this_round + 1
+    guesses_total <<- guesses_total + 1
     
     
-    #Use our dataset to get artist, song info
-    rv <- reactiveValues(t = test[guesses2, ])
-    updateTextInput(session, "txt1", value = "")
+    #Use our dataset to get the artist and song info
+    rv <- reactiveValues(t = test[guesses_this_round, ])
+    updateTextInput(session, "gts_ui_guess", value = "")
     
     
     #Get the artist
@@ -350,7 +511,6 @@ server <- function(input, output, session) {
     #Get the song
     song <- rv$t[18]
     
-    
     #Clean the song string (remove all after a dash or parentheses. Change & and + to and)
     song2 <- song
     song2 <- str_replace(song2, " -.*", "")
@@ -358,17 +518,19 @@ server <- function(input, output, session) {
     song2 <- str_replace(song2, "&","and")
     song2 <- str_replace(song2, "\\+","and")
     
-
-    #Convert the user input and artist data to lowercase
+    
+    #Convert the user input and artist data to lowercase. Remove the word "the" from the fuzzy matching
     twicexx <- tolower(song2)
-    once2 <- tolower(input$txt1)
+    twicexx <- str_replace(twicexx,"the ","")
+    once2 <- tolower(trimws(input$gts_ui_guess, which=c("both")))
+    once2 <- str_replace(once2, "the ","")
     
     
     #Check if the user input matches the song title. The text matching software is more lenient if the string is longer
     if (str_length(twicexx) < 6 | is.na(twicexx)) {
       txtcheckxx <- amatch(once2, twicexx, maxDist = 2) == 1
     } else{
-      txtcheckxx <- amatch(once2, twicexx, maxDist = 4) == 1
+      txtcheckxx <- amatch(once2, twicexx, maxDist = 3) == 1
     }
     
     
@@ -380,8 +542,8 @@ server <- function(input, output, session) {
     
     #Update the score and other vars depending on if the user was correct
     if (txtcheckxx == TRUE) {
-      score <<- score + 1
-      score2 <<- score2 + 1
+      score_total <<- score_total + 1
+      score_this_round <<- score_this_round + 1
       y <- 0
       ret <- "Correct!"
       ret2 <- "Yes"
@@ -393,8 +555,11 @@ server <- function(input, output, session) {
     
     
     #Create a new row on the table
+    c_song <- data.frame("Num" = character(0), "Song" = character(0),"Artist" = character(0),"Guess" = character(0),"Correct" = character(0), "Round" = character(0),stringsAsFactors = FALSE)
+    c_song[1, ] <- c(guesses_total, song, artist[1, 1], input$gts_ui_guess, ret2, round)
+    
     newEntry <- observe({
-      isolate(n$df[nrow(n$df) + 1, ] <- c(song, artist[1, 1], input$txt1, ret2, round))
+      isolate(r_values$df <- rbind(c_song,r_values$df))
     })
     
     
@@ -404,128 +569,187 @@ server <- function(input, output, session) {
       if(round < 2){
       
         if (nrow(artist) == 1) {
-          paste0(ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 2) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 3) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 4) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 5) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else{
-          paste0(ret, " That was \"", song, "\" by ", artist[1,1], " and others", "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " and others", "\n", "Score: ", score_total, "/", guesses_total, "\n")
         }
           
       } else{
         if (nrow(artist) == 1) {
-          paste0(ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist, "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 2) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 3) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 4) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 5) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else{
-          paste0(ret, " That was \"", song, "\" by ", artist[1,1], " and others", "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1,1], " and others", "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         }
-          
       }
     })
     
-    
     #Create the datatable of previous songs tested
     output$songtable <- DT::renderDataTable({
-      DT::datatable(n$df, options = list(pageLength = 100,lengthChange=FALSE)) %>%
-        formatStyle(columns = c(3:9), 'text-align' = 'center')
+        DT::datatable(r_values$df, options = list(pageLength = 100,lengthChange=FALSE), rownames = FALSE, colnames = c('#' = 1))# %>%  
+        #formatStyle(columns = c(3:9), 'text-align' = 'center')
     })
     
-    
     #Update to the next song in the sample
-    songlink <- test[guesses2 + 1, ]$track.preview_url
+    songlink <- test[guesses_this_round + 1, ]$track.preview_url
     runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
     
-    
     #What to do if the sample has run out
-    if (guesses2  == nrow(test)) {
+    if (guesses_this_round  == nrow(test)) {
+      #Show/Hide appropriate HTML elements
       shinyjs::hide("restart")
-      shinyjs::hide("guessbutton")
-      shinyjs::hide("txt1")
+      shinyjs::hide("gts_but_submit_guess")
+      shinyjs::hide("gts_ui_guess")
+      shinyjs::hide("numsongsavailable")
       shinyjs::hide("myaudio")
-      shinyjs::hide("numsongs")
-      shinyjs::show("newplay")
-      shinyjs::show("selectbutton")
-      shinyjs::show("txt2")
-      shinyjs::show("mytable")
-      shinyjs::show("jaja")
-      shinyjs::show("jajaja")
-      shinyjs::show("switchtoartist")
-      shinyjs::show("playagainsong")
-      output$newplay <- renderUI(get_newplay())
+      
+      shinyjs::show("head1")
+      shinyjs::show("gts_but_start")
+      shinyjs::show("gta_but_start")
     }
   })
   
-  
-  
-  #
-  #
-  #
-  
-  
-  
-  #Guess the Artist
-  #What occurs when you select a Playlist
-  observeEvent(input$selectbutton1, {
-    shinyjs::hide("playagainartist")
-    shinyjs::hide("switchtosong")
+  #Replay a playlist
+  observeEvent(input$gts_but_replay_playlist, {
+    
     shinyjs::hide("error")
     shinyjs::hide("error2")
+    shinyjs::hide("error3")
+    shinyjs::hide("gts_ui_numsongs")
+    shinyjs::hide("gts_but_submit_numsongs")
+    shinyjs::hide("gta_ui_numsongs")
+    shinyjs::hide("gta_but_submit_numsongs")
     
-    #This var tracks the number of plays/score in the current sample
-    guesses2 <<- 0
-    score2 <<- 0
+    
+    #Tracks the number of plays/score in the current sample
+    guesses_this_round <<- 0
+    score_this_round <<- 0
     round <<- round + 1
+    
+    #Update the textbox to blank
+    updateTextInput(session, "gts_ui_playlist", value = "")
+    
+
+
+    #####
+    #Remove songs that do not have a preview
+    whichna <- which(is.na(tot_allsongs_g$track.preview_url))
+
+    
+    shinyjs::show("numsongsavailable")
+    output$numsongsavailable <- renderUI(get_numsongs_tag(nrow(tot_allsongs_g), nrow(test), totallplaylist_g))
+    shinyjs::hide("newplay")
+    shinyjs::hide("gts_but_replay_playlist")
+    shinyjs::hide("gts_but_submit_playlist")
+    shinyjs::hide("gts_ui_playlist")
+    shinyjs::hide("mytable")
+    shinyjs::show("gts_ui_numsongs")
+        
+    updateTextInput(session, "gts_ui_numsongs", value = min(nrow(tot_allsongs_g),25))
+        
+    shinyjs::show("gts_but_submit_numsongs")
+  })
+  
+  
+  #
+  #
+  #
+  
+  #
+  #
+  # 
+
+  
+  ###Guess the Artist
+  #Submit a playlist
+  observeEvent(input$gta_but_submit_playlist, {
+    
+    shinyjs::hide("error")
+    shinyjs::hide("error2")
+    shinyjs::hide("error3")
+    shinyjs::hide("gta_but_replay_playlist")
+    shinyjs::hide("gts_ui_numsongs")
+    shinyjs::hide("gts_but_submit_numsongs")
+    shinyjs::hide("gta_ui_numsongs")
+    shinyjs::hide("gta_but_submit_numsongs")
+    
+    
+    #Tracks the number of plays/score in the current sample
+    guesses_this_round <<- 0
+    score_this_round <<- 0
+    round <<- round + 1
+    
+    #Initialize the list of songs in the playlist
     datalist = list()
     
+    #Updates the textbox to blank
+    updateTextInput(session, "gta_ui_playlist", value = "")
     
-    #Updates the text in the textbox to blank
-    updateTextInput(session, "txt21", value = "")
+    #Allows "Submit" == press Enter Key
+    value <- eventReactive(input$gta_but_submit_playlist, {
+      input$gta_ui_playlist
+    })
     
+    
+    #Clean playlist name and get playlist data
     #Use the user input. Cut off the first part of the copy
-    ttt <- str_replace(input$txt21, "spotify:playlist:", "")
-    ttt <- gsub("https://open.spotify.com/playlist/", "\\1",ttt)
-    ttt <- gsub("\\?.*","\\1",ttt)
+    current_playlist <- str_replace(input$gta_ui_playlist, "spotify:playlist:", "")
+    current_playlist <- gsub("https://open.spotify.com/playlist/", "\\1",current_playlist)
+    current_playlist <- gsub("\\?.*","\\1",current_playlist)
     
     
     #Check if the user's input a valid playlist (has the correct length and is the correct format (tested by seeing if it links to a valid playlist))
     txtcheck <- TRUE
-    url1 <- paste0("https://open.spotify.com/playlist/",ttt)
-    if(str_length(ttt) != 22){
+    playlist_url <- paste0("https://open.spotify.com/playlist/",current_playlist)
+    if(str_length(current_playlist) != 22){
       txtcheck <- FALSE
     }
-    if(http_error(url1)){
+    if(http_error(playlist_url)){
       txtcheck <- FALSE
     }
-    
     
     #If the playlist is valid
     if (txtcheck == TRUE) {
-      ttt_c <<- ttt
+      
+      #Stores the playlist link for the replay button
+      last_playlist <<- current_playlist
+      
+      
+      shinyjs::hide("gta_but_submit_playlist")
+      shinyjs::hide("gta_ui_playlist")
+      shinyjs::show("loading")
+      
+      
       #Spotify can only get 100 songs at a time, so calculate how many times we need to get playlists
-      runs <- get_playlist(ttt)$tracks$total %/% 100 + 1
+      api_calls <- get_playlist(current_playlist)$tracks$total %/% 100 + 1
       
       #Get all the songs in the playlist and add them to a dataframe
-      for (j in 1:runs) {
-        allsongs <- data.frame(get_playlist_tracks(ttt, offset = 100 * (j - 1)))
+      for (j in 1:api_calls) {
+        allsongs <- data.frame(get_playlist_tracks(current_playlist, offset = 100 * (j - 1)))
         datalist[[j]] <- allsongs
       }
+      
+      
       tot_allsongs <- dplyr::bind_rows(datalist)
       
       totallplaylist <- nrow(tot_allsongs)
       
-
+      
       #Remove songs that do not have a preview, necessary to redefine
       whichna <- which(is.na(tot_allsongs$track.preview_url))
       
@@ -536,65 +760,110 @@ server <- function(input, output, session) {
       
       #If all the songs in the playlist are invalid, error; else run correctly
       if(nrow(tot_allsongs) == 0){
+        shinyjs::show("gta_but_submit_playlist")
+        shinyjs::show("gta_ui_playlist")
+        shinyjs::hide("loading")
+        
         output$error <- renderUI(get_error())
         shinyjs::show("error")
         output$error2 <- renderUI(get_error2())
         shinyjs::show("error2")
-      } else{
+      } else{     
+
+        tot_allsongs_g <<- tot_allsongs
+        totallplaylist_g <<- totallplaylist
+        shinyjs::show("numsongsavailable")
+        output$numsongsavailable <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
         
-        #Sample either N or the number of valid songs in the playlist
-        samp <- sample(1:nrow(tot_allsongs), min(25, nrow(tot_allsongs)), replace = FALSE)
-        test <- tot_allsongs[samp, ]
-        
-        
-        #Guesses2 = 0. Choose the first song and play it
-        shinyjs::show("myaudio")
-        songlink <- test[guesses2 + 1, ]$track.preview_url
-        runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
-        
-        
-        #Show how many songs were sampled out of the total in the playlist
-        output$numsongs <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
-        
-        test <<- test
-        
-        shinyjs::show("restart")
-        shinyjs::show("guessbutton1")
-        shinyjs::show("txt11")
-        shinyjs::show("numsongs")
         shinyjs::hide("newplay")
-        shinyjs::hide("selectbutton1")
-        shinyjs::hide("txt21")
+        shinyjs::hide("loading")
         shinyjs::hide("mytable")
-        shinyjs::hide("jaja")
-        shinyjs::hide("jajaja")
+        shinyjs::show("gta_ui_numsongs")
+        
+        updateTextInput(session, "gta_ui_numsongs", value = min(nrow(tot_allsongs),25))
+        
+        shinyjs::show("gta_but_submit_numsongs")
       }
     } else{
-      
+        
       #If the playlist is not valid, show that there was an error
       output$error <- renderUI(get_error())
       shinyjs::show("error")
     }
   })
-  
-  
-  #What occurs when the guess artist button is pressed
-  observeEvent(input$guessbutton1, {
+
+  #Submit number of songs
+  observeEvent(input$gta_but_submit_numsongs, {
     
     #Allows "Submit" == press Enter Key
-    value <- eventReactive(input$guessbutton1, {
-      input$txt11
+    value <- eventReactive(input$gta_but_submit_numsongs, {
+      input$gta_ui_numsongs
+    })
+    
+    
+    numsongs <- as.numeric(input$gta_ui_numsongs)
+    
+    
+    #Error statement if the input is invalid
+    if((is.na(numsongs)) | (numsongs %% 1 != 0) | (numsongs > nrow(tot_allsongs_g)) | (numsongs <= 0)){
+      
+      #Update the textbox to the default 25
+      updateTextInput(session, "gta_ui_numsongs", value = 25)
+      
+      output$error3 <- renderUI(get_error3())
+      shinyjs::show("error3")
+      
+    } else{
+      
+      shinyjs::hide("error3")
+      
+      #Sample number of desired songs
+      samp <- sample(1:nrow(tot_allsongs_g), numsongs, replace = FALSE)
+      
+      #Store the valid songs in TEST
+      test <- tot_allsongs_g[samp, ]
+      
+      
+      shinyjs::show("restart")
+      shinyjs::show("gta_ui_guess")  
+      shinyjs::show("gta_but_submit_guess")
+      shinyjs::hide("gta_ui_numsongs")
+      shinyjs::hide("gta_but_submit_numsongs")
+      shinyjs::hide("numsongsavailable")
+      
+              
+      #Choose the first song and play it
+      shinyjs::show("myaudio")
+      songlink <- test[guesses_this_round + 1, ]$track.preview_url
+      runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
+        
+        
+      #Update the textbox to blank
+      updateTextInput(session, "gta_ui_numsongs", value = "")
+      
+      #Allow access outside of this function  
+      test <<- test
+      }
+    numsongs <<- numsongs
+  })
+
+  #Submit song guess
+  observeEvent(input$gta_but_submit_guess, {
+    
+    #Allows "Submit" == press Enter Key
+    value <- eventReactive(input$gta_but_submit_guess, {
+      input$gta_ui_guess
     })
     
     
     #Record a guess
-    guesses2 <<- guesses2 + 1
-    guesses <<- guesses + 1
+    guesses_this_round <<- guesses_this_round + 1
+    guesses_total <<- guesses_total + 1
     
     
     #Use our dataset to get artist, song info
-    rv <- reactiveValues(t = test[guesses2, ])
-    updateTextInput(session, "txt11", value = "")
+    rv <- reactiveValues(t = test[guesses_this_round, ])
+    updateTextInput(session, "gta_ui_guess", value = "")
     
     
     #Get the artist
@@ -606,44 +875,64 @@ server <- function(input, output, session) {
     song <- rv$t[18]
     
     
-    #Convert the user input and artist data to lowercase
-    once2 <- tolower(input$txt11)
+    #Convert the user input and artist data to lowercase. Remove 'the' from fuzzy matching.
+    once2 <- tolower(trimws(input$gta_ui_guess, which=c("both")))
     
     once2 <- str_replace(once2, "&","and")
     once2 <- str_replace(once2, "\\+","and")
+    once2 <- str_replace(once2, "the ","")
     
     twicex <- tolower(artist[1, 1])
+    twicex <- str_replace(twicex, "the ","")
+    twicex <- str_replace(twicex, "&","and")
+    twicex <- str_replace(twicex, "\\+","and")
+    
     twicex2 <- tolower(artist[2, 1])
+    twicex2 <- str_replace(twicex2, "the ","")
+    twicex2 <- str_replace(twicex2, "&","and")
+    twicex2 <- str_replace(twicex2, "\\+","and")
+    
     twicex3 <- tolower(artist[3, 1])
+    twicex3 <- str_replace(twicex3, "the ","")
+    twicex3 <- str_replace(twicex3, "&","and")
+    twicex3 <- str_replace(twicex3, "\\+","and")
+    
     twicex4 <- tolower(artist[4, 1])
+    twicex4 <- str_replace(twicex4, "the ","")
+    twicex4 <- str_replace(twicex4, "&","and")
+    twicex4 <- str_replace(twicex4, "\\+","and")
+    
     twicex5 <- tolower(artist[5, 1])
+    twicex5 <- str_replace(twicex5, "the ","")
+    twicex5 <- str_replace(twicex5, "&","and")
+    twicex5 <- str_replace(twicex5, "\\+","and")
     
     
     #Check if the user input matches any of the artists on the track. The text matching software is more lenient if the string is longer
     if (str_length(twicex) < 6 | is.na(twicex)) {
       txtcheckx <- amatch(once2, twicex, maxDist = 2) == 1
     } else{
-      txtcheckx <- amatch(once2, twicex, maxDist = 4) == 1
+      txtcheckx <- amatch(once2, twicex, maxDist = 3) == 1
     }
     if (str_length(twicex2) < 6 | is.na(twicex2)) {
       txtcheckx2 <- amatch(once2, twicex2, maxDist = 2) == 1
     } else{
-      txtcheckx2 <- amatch(once2, twicex2, maxDist = 4) == 1
+      txtcheckx2 <- amatch(once2, twicex2, maxDist = 3) == 1
     }
     if (str_length(twicex3) < 6 | is.na(twicex3)) {
       txtcheckx3 <- amatch(once2, twicex3, maxDist = 2) == 1
     } else{
-      txtcheckx3 <- amatch(once2, twicex3, maxDist = 4) == 1
+      txtcheckx3 <- amatch(once2, twicex3, maxDist = 3) == 1
     }
     if (str_length(twicex4) < 6 | is.na(twicex4)) {
       txtcheckx4 <- amatch(once2, twicex4, maxDist = 2) == 1
     } else{
-      txtcheckx4 <- amatch(once2, twicex4, maxDist = 4) == 1
+      txtcheckx4 <- amatch(once2, twicex4, maxDist = 3) == 1
     }
     if (str_length(twicex5) < 6 | is.na(twicex5)) {
       txtcheckx5 <- amatch(once2, twicex5, maxDist = 2) == 1
     } else{
-      txtcheckx5 <- amatch(once2, twicex5, maxDist = 4) == 1
+      txtcheckx5 <- amatch(once2, twicex5, maxDist = 3) == 1
     }
     
     
@@ -667,8 +956,8 @@ server <- function(input, output, session) {
     
     #Update the score and other vars depending on if the user was correct
     if (txtcheckx == TRUE | txtcheckx2 == TRUE | txtcheckx3 == TRUE | txtcheckx4 == TRUE | txtcheckx5 == TRUE) {
-      score <<- score + 1
-      score2 <<- score2 + 1
+      score_total <<- score_total + 1
+      score_this_round <<- score_this_round + 1
       y <- 0
       ret <- "Correct!"
       ret2 <- "Yes"
@@ -680,8 +969,11 @@ server <- function(input, output, session) {
     
     
     #Create a new row on the table
+    c_song <- data.frame("Num" = character(0), "Song" = character(0),"Artist" = character(0),"Guess" = character(0),"Correct" = character(0), "Round" = character(0),stringsAsFactors = FALSE)
+    c_song[1, ] <- c(guesses_total, song, artist[1, 1], input$gta_ui_guess, ret2, round)
+    
     newEntry <- observe({
-      isolate(n$df[nrow(n$df) + 1, ] <- c(song, artist[1, 1], input$txt11, ret2, round))
+      isolate(r_values$df <- rbind(c_song,r_values$df))
     })
     
     
@@ -691,261 +983,102 @@ server <- function(input, output, session) {
       if(round < 2){
       
         if (nrow(artist) == 1) {
-          paste0(ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 2) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 3) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 4) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else if (nrow(artist) == 5) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score_total, "/", guesses_total, "\n")
         } else{
-          paste0(ret, " That was \"", song, "\" by ", artist[1,1], " and others", "\n", "Score: ", score, "/", guesses, "\n")
+          paste0("Song ",guesses_total,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " and others", "\n", "Score: ", score_total, "/", guesses_total, "\n")
         }
       } else{
         if (nrow(artist) == 1) {
-          paste0(ret, " That was \"", song, "\" by ", artist, "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist, "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 2) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " & ", artist[2, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 3) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], " & ", artist[3, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 4) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], " & ", artist[4, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else if (nrow(artist) == 5) {
-          paste0(ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], ", ", artist[2, 1], ", ", artist[3, 1], ", ", artist[4, 1], " & ", artist[5, 1], "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         } else{
-          paste0(ret, " That was \"", song, "\" by ", artist[1,1], " and others", "\n", "Score: ", score, "/", guesses, "\n", "Score This Round: ",score2, "/",guesses2)
+          paste0("Song ",guesses_this_round,"/",numsongs,"\n",ret, " That was \"", song, "\" by ", artist[1, 1], " and others", "\n", "Score this Round: ", score_this_round, "/", guesses_this_round, "\n", "Total Score: ",score_total, "/",guesses_total)
         }
-        
-        
-        
       }
-      
-      
     })
     
     
     #Create the datatable of previous songs tested
     output$songtable <- DT::renderDataTable({
-      DT::datatable(n$df, options = list(pageLength = 100,lengthChange=FALSE)) %>%
-        formatStyle(columns = c(3:9), 'text-align' = 'center')
+      DT::datatable(r_values$df, options = list(pageLength = 100,lengthChange=FALSE), rownames = FALSE, colnames = c('#' = 1))# %>%  
+      #formatStyle(columns = c(3:9), 'text-align' = 'center')
     })
     
     
     #Update to the next song in the sample
-    songlink <- test[guesses2 + 1, ]$track.preview_url
+    songlink <- test[guesses_this_round + 1, ]$track.preview_url
     runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
     
     
     #What to do if the sample has run out
-    if (guesses2  == nrow(test)) {
+    if (guesses_this_round  == nrow(test)) {
+      #Show/Hide appropriate HTML elements
       shinyjs::hide("restart")
-      shinyjs::hide("guessbutton1")
-      shinyjs::hide("txt11")
+      shinyjs::hide("gta_but_submit_guess")
+      shinyjs::hide("gta_ui_guess")
+      shinyjs::hide("numsongsavailable")
       shinyjs::hide("myaudio")
-      shinyjs::hide("numsongs")
-      shinyjs::show("newplay")
-      shinyjs::show("selectbutton1")
-      shinyjs::show("txt21")
-      shinyjs::show("mytable")
-      shinyjs::show("jaja")
-      shinyjs::show("jajaja")
-      shinyjs::show("switchtosong")
-      shinyjs::show("playagainartist")
-      output$newplay <- renderUI(get_newplay())
+
+      shinyjs::show("head1")
+      shinyjs::show("gts_but_start")
+      shinyjs::show("gta_but_start")
     }
   })
   
-  
-  #
-  #
-  #
-  
-  
-  #Replay Buttons
-  observeEvent(input$playagainsong, {
-    shinyjs::hide("playagainsong")
-    shinyjs::hide("switchtoartist")
+  #Replay a playlist
+  observeEvent(input$gta_but_replay_playlist, {
+    
     shinyjs::hide("error")
     shinyjs::hide("error2")
+    shinyjs::hide("error3")
+    shinyjs::hide("gts_ui_numsongs")
+    shinyjs::hide("gts_but_submit_numsongs")
+    shinyjs::hide("gta_ui_numsongs")
+    shinyjs::hide("gta_but_submit_numsongs")
     
-    #This var tracks the number of plays in the current sample
-    guesses2 <<- 0
-    score2 <<- 0
+    
+    #Tracks the number of plays/score in the current sample
+    guesses_this_round <<- 0
+    score_this_round <<- 0
     round <<- round + 1
-    datalist = list()
+    
+    #Update the textbox to blank
+    updateTextInput(session, "gta_ui_playlist", value = "")
     
     
-    #We know that the playlist is already valid. Import that value
-    ttt <- ttt_c
-    txtcheck <- TRUE
-
     
-    #If the playlist is valid
-    if (txtcheck == TRUE) {
-      ttt_c <<- ttt
-      #Spotify can only get 100 songs at a time, so calculate how many times we need to get playlists
-      runs <- get_playlist(ttt)$tracks$total %/% 100 + 1
-      
-      #Get all the songs in the playlist and add them to a dataframe
-      for (j in 1:runs) {
-        allsongs <- data.frame(get_playlist_tracks(ttt, offset = 100 * (j - 1)))
-        datalist[[j]] <- allsongs
-      }
-      tot_allsongs <- dplyr::bind_rows(datalist)
-      
-      totallplaylist <- nrow(tot_allsongs)
-      
-      
-      #Remove songs that do not have a preview, necessary to redefine
-      whichna <- which(is.na(tot_allsongs$track.preview_url))
-      
-      #If there is no NA, do not remove any songs
-      if(!(length(whichna) == 0) ){
-        tot_allsongs <- tot_allsongs[-c(whichna), ]    
-      }
-      
-      #If all the songs in the playlist are invalid, error; else run correctly
-      if(nrow(tot_allsongs) == 0){
-        output$error <- renderUI(get_error())
-        shinyjs::show("error")
-        output$error2 <- renderUI(get_error2())
-        shinyjs::show("error2")
-      } else{
-        
-        #Sample either N or the number of valid songs in the playlist
-        samp <- sample(1:nrow(tot_allsongs), min(25, nrow(tot_allsongs)), replace = FALSE)
-        test <- tot_allsongs[samp, ]
-        
-        
-        #Guesses2 = 0. Choose the first song and play it
-        shinyjs::show("myaudio")
-        songlink <- test[guesses2 + 1, ]$track.preview_url
-        runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
-        
-        
-        #Show how many songs were sampled out of the total in the playlist
-        output$numsongs <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
-        
-        
-        test <<- test
-        
-        shinyjs::show("restart")
-        shinyjs::show("guessbutton")
-        shinyjs::show("txt1")
-        shinyjs::show("numsongs")
-        shinyjs::hide("newplay")
-        shinyjs::hide("selectbutton")
-        shinyjs::hide("txt2")
-        shinyjs::hide("mytable")
-        shinyjs::hide("jaja")
-        shinyjs::hide("jajaja")
-      }
-    } else{
-      
-      #If the playlist is not valid, show that there was an error
-      output$error <- renderUI(get_error())
-      shinyjs::show("error")
-    }
-    
-  })
-  
-
-  observeEvent(input$playagainartist, {
-    shinyjs::hide("playagainartist")
-    shinyjs::hide("switchtosong")
-    shinyjs::hide("error")
-    shinyjs::hide("error2")
-    
-    #This var tracks the number of plays in the current sample
-    guesses2 <<- 0
-    score2 <<- 0
-    round <<- round + 1
-    datalist = list()
+    #####
+    #Remove songs that do not have a preview
+    whichna <- which(is.na(tot_allsongs_g$track.preview_url))
     
     
-    #Import the last playlist
-    ttt <- ttt_c
+    shinyjs::show("numsongsavailable")
+    output$numsongsavailable <- renderUI(get_numsongs_tag(nrow(tot_allsongs_g), nrow(test), totallplaylist_g))
+    shinyjs::hide("newplay")
+    shinyjs::hide("gta_but_replay_playlist")
+    shinyjs::hide("gta_but_submit_playlist")
+    shinyjs::hide("gta_ui_playlist")
+    shinyjs::hide("mytable")
+    shinyjs::show("gta_ui_numsongs")
     
+    updateTextInput(session, "gta_ui_numsongs", value = min(nrow(tot_allsongs_g),25))
     
-    #Check if the user's input a valid playlist (has the correct length and is the correct format (tested by seeing if it links to a valid playlist))
-    txtcheck <- TRUE
-    url1 <- paste0("https://open.spotify.com/playlist/",ttt)
-    if(str_length(ttt) != 22){
-      txtcheck <- FALSE
-    }
-    if(http_error(url1)){
-      txtcheck <- FALSE
-    }
-    
-    
-    #If the playlist is valid
-    if (txtcheck == TRUE) {
-      
-      #Spotify can only get 100 songs at a time, so calculate how many times we need to get playlists
-      runs <- get_playlist(ttt)$tracks$total %/% 100 + 1
-      
-      #Get all the songs in the playlist and add them to a dataframe
-      for (j in 1:runs) {
-        allsongs <- data.frame(get_playlist_tracks(ttt, offset = 100 * (j - 1)))
-        datalist[[j]] <- allsongs
-      }
-      tot_allsongs <- dplyr::bind_rows(datalist)
-      
-      totallplaylist <- nrow(tot_allsongs)
-      
-      
-      #Remove songs that do not have a preview, necessary to redefine
-      whichna <- which(is.na(tot_allsongs$track.preview_url))
-      
-      #If there is no NA, do not remove any songs
-      if(!(length(whichna) == 0) ){
-        tot_allsongs <- tot_allsongs[-c(whichna), ]    
-      }
-      
-      #If all the songs in the playlist are invalid, error; else run correctly
-      if(nrow(tot_allsongs) == 0){
-        output$error <- renderUI(get_error())
-        shinyjs::show("error")
-        output$error2 <- renderUI(get_error2())
-        shinyjs::show("error2")
-      } else{
-        
-        #Sample either N or the number of valid songs in the playlist
-        samp <- sample(1:nrow(tot_allsongs), min(25, nrow(tot_allsongs)), replace = FALSE)
-        test <- tot_allsongs[samp, ]
-        
-        
-        #Guesses2 = 0. Choose the first song and play it
-        shinyjs::show("myaudio")
-        songlink <- test[guesses2 + 1, ]$track.preview_url
-        runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
-        
-        
-        #Show how many songs were sampled out of the total in the playlist
-        output$numsongs <- renderUI(get_numsongs_tag(nrow(tot_allsongs), nrow(test), totallplaylist))
-        
-        test <<- test
-        
-        shinyjs::show("restart")
-        shinyjs::show("guessbutton1")
-        shinyjs::show("txt11")
-        shinyjs::show("numsongs")
-        shinyjs::hide("newplay")
-        shinyjs::hide("selectbutton1")
-        shinyjs::hide("txt21")
-        shinyjs::hide("mytable")
-        shinyjs::hide("jaja")
-        shinyjs::hide("jajaja")
-      }
-    } else{
-      
-      #If the playlist is not valid, show that there was an error
-      output$error <- renderUI(get_error())
-      shinyjs::show("error")
-    }
-    
+    shinyjs::show("gta_but_submit_numsongs")
   })
   
   
@@ -953,7 +1086,12 @@ server <- function(input, output, session) {
   #
   #
   
+  #
+  #
+  #
   
+  
+  ###Replay Buttons
   #Restart during a current play through
   observeEvent(input$restart, {
     #Set the current song to NA so no sound is playing
@@ -961,40 +1099,18 @@ server <- function(input, output, session) {
     runjs(sprintf("document.getElementById('myaudio').src = '%s';", songlink))
     
     #Show/Hide appropriate HTML elements
-    shinyjs::show("head1")
-    shinyjs::show("songbutton")
-    shinyjs::show("artistbutton")
-    shinyjs::hide("playagainsong")
-    shinyjs::hide("playagainartist")
-    shinyjs::hide("myaudio")
     shinyjs::hide("restart")
-    shinyjs::hide("guessbutton")
-    shinyjs::hide("txt1")
-    shinyjs::hide("guessbutton1")
-    shinyjs::hide("txt11")
-    shinyjs::hide("numsongs")
+    shinyjs::hide("gts_but_submit_guess")
+    shinyjs::hide("gts_ui_guess")
+    shinyjs::hide("gta_but_submit_guess")
+    shinyjs::hide("gta_ui_guess")
+    shinyjs::hide("numsongsavailable")
+    shinyjs::hide("myaudio")
+    
+    shinyjs::show("head1")
+    shinyjs::show("gts_but_start")
+    shinyjs::show("gta_but_start")
   })
-  
-  #Swtich UI to Song verison
-  observeEvent(input$switchtosong, {
-    shinyjs::hide("playagainartist")
-    shinyjs::hide("switchtosong")
-    shinyjs::hide("selectbutton1")
-    shinyjs::hide("txt21")
-    shinyjs::show("selectbutton")
-    shinyjs::show("txt2")
-  })
-  
-  #Switch UI to Artist version
-  observeEvent(input$switchtoartist, {
-    shinyjs::hide("playagainsong")
-    shinyjs::hide("switchtoartist")
-    shinyjs::hide("selectbutton")
-    shinyjs::hide("txt2")
-    shinyjs::show("selectbutton1")
-    shinyjs::show("txt21")
-  })
-  
 }
 
 shinyApp(ui = ui, server = server)
