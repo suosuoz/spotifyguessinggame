@@ -504,12 +504,12 @@ server <- function(input, output, session) {
     
     
     #Get the artist
-    aj <- rv$t[9]
+    aj <- rv$t[15]
     artist <- aj[[1]][[1]][3]
     
     
     #Get the song
-    song <- rv$t[18]
+    song <- rv$t[21]
     
     #Clean the song string (remove all after a dash or parentheses. Change & and + to and)
     song2 <- song
@@ -867,12 +867,12 @@ server <- function(input, output, session) {
     
     
     #Get the artist
-    aj <- rv$t[9]
+    aj <- rv$t[15]
     artist <- aj[[1]][[1]][3]
     
     
     #Get the song
-    song <- rv$t[18]
+    song <- rv$t[21]
     
     
     #Convert the user input and artist data to lowercase. Remove 'the' from fuzzy matching.
